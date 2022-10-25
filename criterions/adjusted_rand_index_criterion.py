@@ -10,3 +10,6 @@ class AdjustedRandIndexCriterion(CriterionInterface):
 
     def __call__(self, x: List[int], y: List[int]) -> float:
         return 1. - adjusted_rand_score(x, y)
+
+# [1, 2, 2, 3]
+# [2, 3, 3, 1]

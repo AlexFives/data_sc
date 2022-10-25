@@ -1,25 +1,30 @@
 from evaluator import Evaluator
-from weights_generators import DirichletWeightsGenerator
+from weights_generators import DirichletWeightsGenerator, CycleWeightsGenerator
+from normalizers import *
 from clustering_algos import KMeansClusteringAlgo, SpectalClusteringAlgo
 from criterions import AdjustedRandIndexCriterion
 from savers import CSVSaver
 from input_generators import RandomInputGenerator, CSVInputGenerator
 
-NUM_ITERATIONS = 1000
 INPUT_FILE = "input.csv"
 OUTPUT_FILE = "output.csv"
 
-# input_generator = CSVInputGenerator(INPUT_FILE)
-input_generator = RandomInputGenerator(20, 5)
+normalizer = MinMaxNormalizer()
+
+input_generator = CSVInputGenerator(normalizer, INPUT_FILE)
+# input_generator = RandomInputGenerator(normalizer, 100, 2)
 
 vectors = input_generator.generate()
 
 N, D = vectors.shape
+NUM_CLUSTERS = 3
 
-weights_generator = DirichletWeightsGenerator(D, NUM_ITERATIONS)
+# NUM_ITERATIONS = 1000
+# weights_generator = DirichletWeightsGenerator(D, NUM_ITERATIONS)
+weights_generator = CycleWeightsGenerator(D, step=0.1)
 
-clustering_algo_1 = KMeansClusteringAlgo(D)
-clustering_algo_2 = SpectalClusteringAlgo(D)
+clustering_algo_1 = KMeansClusteringAlgo(NUM_CLUSTERS)
+clustering_algo_2 = SpectalClusteringAlgo(NUM_CLUSTERS)
 
 criterion = AdjustedRandIndexCriterion()
 
