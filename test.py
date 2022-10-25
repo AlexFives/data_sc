@@ -1,103 +1,81 @@
-
+import matplotlib.pyplot as plt
+import csv
 import numpy as np
-import sklearn.cluster as skcluster
-import sklearn.metrics as skmetrics
-import tqdm
-import random
 
-from typing import List
+all_weights = list()
+errors = list()
 
+with open("output.csv", 'r') as file:
+    reader = csv.reader(file)
+    for row in reader:
+        error = float(row[0])
+        weights = row[2:]
+        weights = [float(w) for w in weights]
+        all_weights.append(np.array(weights))
+        errors.append(error)
 
-class ClusteringAlgo:
-    def __init__(self, num_clusters):
-        self._num_clusters = num_clusters
+from input_generators import CSVInputGenerator
+from normalizers import *
 
-    @property
-    def num_clusters(self):
-        return self._num_clusters
+normalizer = MaxNormalizer()
+input_generator = CSVInputGenerator(normalizer, "input.csv")
 
-    @num_clusters.setter
-    def num_clusters(self, new):
-        self._num_clusters = new
+vectors = input_generator.generate()
 
-    def cluster(self, vectors) -> List[int]:
-        """
-        :param vectors: Данные для кластеризации
-        :return: Номер кластера для каждого вектора в vectors
-        """
-        raise NotImplemented
+import sys
 
-class SpectralClusteringAlgo(ClusteringAlgo):
-    def __init__(self, num_clusters):
-        super().__init__(num_clusters)
-        self._algo = skcluster.SpectralClustering(n_clusters=num_clusters)
+print(vectors)
+# sys.exit(0)
 
-    def cluster(self, vectors):
-        return self._algo.fit_predict(vectors)
-	
+from clustering_algos import KMeansClusteringAlgo, SpectalClusteringAlgo
+
+NUM_CLUSTERS = 4
+
+kmeans = KMeansClusteringAlgo(NUM_CLUSTERS)
+spectral = SpectalClusteringAlgo(NUM_CLUSTERS)
 
 
-class KMeansClusteringAlgo(ClusteringAlgo):
-    def __init__(self, num_clusters):
-        super().__init__(num_clusters)
-        self._algo = skcluster.KMeans(num_clusters)
-
-    def cluster(self, vectors) -> List[int]:
-        self._algo.fit(vectors)
-        return self._algo.predict(vectors).tolist()
+def cluster_vectors(vectors):
+    kmeans_clusters = kmeans.cluster(vectors)
+    spectral_clusters = spectral.cluster(vectors)
+    return kmeans_clusters, spectral_clusters
 
 
-class RandomClusteringAlgo(ClusteringAlgo):
-    def __init__(self, num_clusters):
-        super().__init__(num_clusters)
-
-    def cluster(self, vectors) -> List[int]:
-        result = list()
-        for _ in range(len(vectors)):
-            result.append(random.randint(0, self.num_clusters - 1))
-        return result
+def get_color(cluster):
+    if cluster == 1:
+        return 'red'
+    if cluster == 2:
+        return 'blue'
+    else:
+        return 'green'
 
 
-def generate_vectors(n, d):
-    return np.random.rand(n, d)
+def draw_points(axs, clusters, vectors):
+    for i, cluster in enumerate(clusters):
+        color = get_color(cluster)
+        vector = vectors[i]
+        x, y = vector
+        axs.scatter(x, y, color=color)
 
 
-def generate_weights(d):
-    return np.diag(np.random.dirichlet(np.random.rand(d), size=1)[0])
+def draw_distribution(vectors, i):
+    fig, axs = plt.subplots(2)
+
+    kmeans_clusters, spectral_clusters = cluster_vectors(vectors)
+
+    draw_points(axs[0], kmeans_clusters, vectors)
+    draw_points(axs[1], spectral_clusters, vectors)
+
+    plt.savefig(f"plots/w{i}.png")
+    plt.clf()
+    plt.cla()
 
 
-def error_func(x, y):
-    return 1 - skmetrics.adjusted_rand_score(x, y)
+draw_distribution(vectors, 0)
 
+for i, weights in enumerate(all_weights):
+    weights_diag = np.diag(weights)
+    new_vectors = np.dot(vectors, weights_diag)
+    draw_distribution(new_vectors, i)
 
-def calc_error(vectors, clustering_algo1, clustering_algo2):
-    cluster1 = clustering_algo1.cluster(vectors)
-    cluster2 = clustering_algo2.cluster(vectors)
-    return error_func(cluster1, cluster2)
-
-
-def train(vectors, clustering_algo1, clustering_algo2, error_threshold=0, use_tqdm=False):
-    n, d = vectors.shape
-    best_score = calc_error(vectors, clustering_algo1, clustering_algo2)
-    best_weights = np.diag(np.ones(d))
-    progress = tqdm.tqdm(range(n * n)) if use_tqdm else range(n * n)
-    for _ in progress:
-        weights = generate_weights(d)
-        weighted_vectors = np.dot(vectors, weights)
-        score = calc_error(weighted_vectors, clustering_algo1, clustering_algo2)
-        if score < best_score:
-            best_score = score
-            best_weights = weights
-        if best_score < error_threshold:
-            break
-    return np.diagonal(best_weights), best_score
-
-if __name__ == "__main__":
-    clustering_algo1 = KMeansClusteringAlgo(8)
-    clustering_algo2 = SpectralClusteringAlgo(8)
-    vectors = generate_vectors(10, 5)
-    weights, error = train(vectors, clustering_algo1, clustering_algo2, use_tqdm=True)
-    print()
-    print(weights)
-    print()
-    print(error)
+# 0.05742552768181741 0.6315423906153572 0.36845760938464267

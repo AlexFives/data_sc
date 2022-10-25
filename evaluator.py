@@ -23,6 +23,9 @@ class Evaluator:
 
     def evaluate(self, vectors: np.ndarray, use_tqdm: bool = False):
         weights_iterator = self.__weights_generator.generate()
+        if weights_iterator is None:
+            print("No combinations")
+            return
         if use_tqdm:
             weights_iterator = tqdm.tqdm(weights_iterator)
         best_state = State.bad_state()
@@ -34,6 +37,7 @@ class Evaluator:
             if state.error > 1:
                 print(state.error, state.weights)
         self.__saver.save_state(best_state)
+        return best_state
 
     def __process_weights(self, weights):
         return np.diag(weights)

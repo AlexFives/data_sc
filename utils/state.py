@@ -9,4 +9,4 @@ class State:
 
     @classmethod
     def bad_state(cls):
-        return cls(None, 10.0)
+        return cls(np.ndarray([0]), 10.0)

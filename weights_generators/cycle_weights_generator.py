@@ -31,4 +31,4 @@ class CycleWeightsGenerator(WeightsGeneratorInterface):
         if 0 in weights:
             return False
         weights_sum = sum(weights)
-        return abs(1 - weights_sum) < self.__step
+        return abs(1 - weights_sum) < self.__step / 10
