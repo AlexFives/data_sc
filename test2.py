@@ -1,8 +1,10 @@
-from weights_generators import CycleWeightsGenerator
+from weights_generators import CombWeightsGenerator
 
-D = 4
+gen = CombWeightsGenerator(10, 0.05)
 
-weights_generator = CycleWeightsGenerator(D, step=0.05)
+counter = 0
+for x in gen.generate():
+    counter += 1
+    print(x)
 
-for weights in weights_generator.generate():
-    print(weights)
+print(f"All: {counter}")

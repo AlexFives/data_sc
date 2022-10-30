@@ -1,3 +1,4 @@
 from .weights_generator_interface import WeightsGeneratorInterface
 from .dirichlet_weights_generator import DirichletWeightsGenerator
 from .cycle_weights_generator import CycleWeightsGenerator
+from .comb_weights_generator import CombWeightsGenerator
