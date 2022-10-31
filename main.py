@@ -1,5 +1,5 @@
 from evaluator import Evaluator
-from weights_generators import DirichletWeightsGenerator, CycleWeightsGenerator
+from weights_generators import *
 from normalizers import *
 from clustering_algos import KMeansClusteringAlgo, SpectalClusteringAlgo
 from criterions import AdjustedRandIndexCriterion
@@ -27,9 +27,9 @@ print(vectors)
 N, D = vectors.shape
 NUM_CLUSTERS = 10
 
-NUM_ITERATIONS = 15
-weights_generator = DirichletWeightsGenerator(D, NUM_ITERATIONS)
-# weights_generator = CycleWeightsGenerator(D, step=0.01)
+# NUM_ITERATIONS = 15
+# weights_generator = DirichletWeightsGenerator(D, NUM_ITERATIONS)
+weights_generator = CombWeightsGenerator(D, step=0.01)
 
 clustering_algo_1 = KMeansClusteringAlgo(NUM_CLUSTERS)
 clustering_algo_2 = SpectalClusteringAlgo(NUM_CLUSTERS)
@@ -48,4 +48,5 @@ evaluator = Evaluator(
 
 best = evaluator.evaluate(vectors, use_tqdm=True)
 print(best.error, best.weights)
-# 0.2862227906968412 [0.1287387  0.36507449 0.01673571 0.4894511 ]
+
+saver.close()

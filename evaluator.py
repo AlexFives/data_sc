@@ -21,7 +21,7 @@ class Evaluator:
         self.__criterion = criterion
         self.__saver = saver
 
-    def evaluate(self, vectors: np.ndarray, use_tqdm: bool = False):
+    def evaluate(self, vectors: np.ndarray, use_tqdm: bool = False, save_all=True):
         weights_iterator = self.__weights_generator.generate()
         if weights_iterator is None:
             print("No combinations")
@@ -31,7 +31,8 @@ class Evaluator:
         best_state = State.bad_state()
         for weights in weights_iterator:
             state = self.__get_state(vectors, weights)
-            self.__saver.save_state(state)
+            if save_all:
+                self.__saver.save_state(state)
             if state.error < best_state.error:
                 best_state = state
             if state.error > 1:

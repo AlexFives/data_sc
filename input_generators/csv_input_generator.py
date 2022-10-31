@@ -22,5 +22,4 @@ class CSVInputGenerator(InputGeneratorInterface):
                 result.append(vector)
         weights = np.array(result)
         normalized_weights = self._normalizer.normalize(weights)
-        print(normalized_weights)
         return normalized_weights
