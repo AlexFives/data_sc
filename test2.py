@@ -78,7 +78,7 @@ tester = Tester(
     normalizer
 )
 
-errors = test(tester, KMeansClusteringAlgo, SpectalClusteringAlgo, 2, D * D + 1)
+errors = test(tester, KMeansClusteringAlgo, SpectralClusteringAlgo, 2, D * D + 1)
 
 print(errors)
 

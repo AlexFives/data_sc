@@ -27,12 +27,12 @@ import sys
 print(vectors)
 # sys.exit(0)
 
-from clustering_algos import KMeansClusteringAlgo, SpectalClusteringAlgo
+from clustering_algos import KMeansClusteringAlgo, SpectralClusteringAlgo
 
 NUM_CLUSTERS = 4
 
 kmeans = KMeansClusteringAlgo(NUM_CLUSTERS)
-spectral = SpectalClusteringAlgo(NUM_CLUSTERS)
+spectral = SpectralClusteringAlgo(NUM_CLUSTERS)
 
 
 def cluster_vectors(vectors):
