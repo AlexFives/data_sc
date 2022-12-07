@@ -3,7 +3,7 @@ from .clustering_algo_interface import *
 from sklearn.cluster import SpectralClustering
 
 
-class SpectalClusteringAlgo(ClusteringAlgoInterface):
+class SpectralClusteringAlgo(ClusteringAlgoInterface):
     def __init__(self, num_clusters: int):
         super().__init__(num_clusters)
         self.__algo = SpectralClustering(n_clusters=num_clusters)
